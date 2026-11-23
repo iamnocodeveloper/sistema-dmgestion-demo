@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DM Gestión Inmobiliaria · Sistema de interesados (demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#12213a; --navy2:#1b2f4f; --ink:#1d2433; --gray:#5b6577; --line:#e3e7ee;
+  --bg:#f2f4f8; --card:#ffffff; --amber:#e09b1e; --amber-soft:#fdf3dd;
+  --ok:#1f8a5b; --warn:#c9762a; --cold:#7a8496; --blue:#2f6fb0;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 8px 24px rgba(16,24,40,.06);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.01em}
+a{color:var(--blue);text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+/* Sidebar */
+.side{background:var(--navy);color:#dbe3f0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand .logo{display:flex;align-items:center;gap:10px}
+.brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--amber),#c97f10);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.brand .mark svg{width:19px;height:19px}
+.brand b{font-size:15px;color:#fff;font-weight:700;letter-spacing:-.02em;display:block}
+.brand small{font-size:11px;color:#8ea0bd;text-transform:uppercase;letter-spacing:.09em}
+.nav{padding:10px 10px;display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:11px;background:none;border:0;color:#b9c6dc;padding:10px 12px;border-radius:9px;font-size:14px;text-align:left;width:100%}
+.nav button svg{width:18px;height:18px;flex:0 0 auto;opacity:.9}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button.active{background:var(--navy2);color:#fff;box-shadow:inset 3px 0 0 var(--amber)}
+.nav .sep{margin:8px 12px;border-top:1px solid rgba(255,255,255,.08)}
+.side .foot{margin-top:auto;padding:14px 16px;font-size:11px;color:#7d8fae;border-top:1px solid rgba(255,255,255,.08)}
+/* Main */
+.main{min-width:0;display:flex;flex-direction:column}
+.top{background:#fff;border-bottom:1px solid var(--line);padding:14px 22px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:20}
+.top .who{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gray)}
+.av{width:32px;height:32px;border-radius:50%;background:var(--navy2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.content{padding:22px;max-width:1180px;width:100%;margin:0 auto}
+.page-title{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.page-title h2{font-size:21px}
+.page-title p{margin:3px 0 0;color:var(--gray);font-size:13px}
+.sec{display:none}
+.sec.on{display:block}
+/* Buttons */
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;padding:9px 14px;font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;gap:8px}
+.btn svg{width:16px;height:16px}
+.btn:hover{border-color:#c9d1de;background:#fbfcfe}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.primary:hover{background:var(--navy2)}
+.btn.amber{background:var(--amber);border-color:var(--amber);color:#3a2a05;font-weight:600}
+.btn.amber:hover{background:#cf8e16}
+.btn.sm{padding:6px 11px;font-size:12.5px}
+/* Cards */
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+.card .hd{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card .hd h3{font-size:14px}
+.card .bd{padding:16px}
+.kpi{padding:16px 18px}
+.kpi .n{font-size:27px;font-weight:700;letter-spacing:-.02em}
+.kpi .l{font-size:12.5px;color:var(--gray);margin-top:2px}
+.kpi .t{font-size:11.5px;color:var(--amber);font-weight:600;margin-top:7px}
+.kpi .ico{float:right;width:34px;height:34px;border-radius:9px;background:var(--amber-soft);display:flex;align-items:center;justify-content:center}
+.kpi .ico svg{width:18px;height:18px;color:var(--amber)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+.s-nuevo{background:#eaf1fb;color:#2560a6}
+.s-contactado{background:#e9f2ff;color:#1d5fa8}
+.s-visita{background:#fdf3dd;color:#a06b0c}
+.s-negociacion{background:#f4ecfd;color:#6c3bb0}
+.s-cerrado{background:#e6f5ee;color:#157a4e}
+.s-frio{background:#eef0f4;color:#5b6577}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+/* Table */
+.table-wrap{overflow-x:auto;min-width:0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray);font-weight:600;background:#fafbfd}
+tbody tr:hover{background:#fafbfd;cursor:pointer}
+td.wrap,th.wrap{white-space:normal;min-width:160px}
+/* Filters */
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.input{position:relative;flex:1;min-width:180px}
+.input svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:#98a2b3}
+.input input{width:100%;padding:9px 12px 9px 34px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;background:#fff}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:12.5px;color:var(--gray)}
+.chip.active{background:var(--navy);border-color:var(--navy);color:#fff}
+/* Embudo */
+.funnel{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.fn{border:1px solid var(--line);border-radius:12px;background:#fff;padding:12px;min-width:0}
+.fn .c{font-size:22px;font-weight:700}
+.fn .t{font-size:11.5px;color:var(--gray);margin-top:2px}
+.fn .bar{height:6px;border-radius:4px;margin-top:10px;background:#eef1f6;overflow:hidden}
+.fn .bar i{display:block;height:100%;border-radius:4px;background:var(--amber)}
+/* ficha */
+.info-row{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13.5px}
+.info-row:last-child{border-bottom:0}
+.info-row .k{color:var(--gray)}
+.info-row .v{font-weight:600;text-align:right}
+.chat{display:flex;flex-direction:column;gap:10px}
+.bub{max-width:82%;padding:9px 12px;border-radius:12px;font-size:13px;line-height:1.4}
+.bub.in{background:#eef1f6;color:var(--ink);border-bottom-left-radius:3px}
+.bub.out{background:#dcf2e4;color:#14432c;align-self:flex-end;border-bottom-right-radius:3px}
+.bub .tm{font-size:10.5px;color:#7a8496;margin-top:4px}
+.seg-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.seg-step:last-child{border-bottom:0}
+.seg-num{width:30px;height:30px;border-radius:50%;background:var(--amber-soft);color:#a06b0c;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.seg-step .tt{font-weight:600;font-size:13.5px}
+.seg-step .dd{font-size:12.5px;color:var(--gray)}
+.wa{background:#e7ded4;border-radius:14px;padding:14px;background-image:radial-gradient(rgba(255,255,255,.35) 1px,transparent 1px);background-size:14px 14px}
+.wa .phone{background:#075e54;color:#fff;border-radius:10px 10px 0 0;padding:9px 12px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+.wa .thread{background:#efe7dd;padding:14px 10px;border-radius:0 0 10px 10px;min-height:150px}
+.wa .msg{background:#fff;max-width:88%;padding:8px 11px;border-radius:10px;font-size:13px;box-shadow:0 1px 1px rgba(0,0,0,.08);margin-bottom:9px;position:relative}
+.wa .msg .tm{font-size:10px;color:#8b9199;text-align:right;margin-top:3px}
+.wa .msg.out{background:#dcf8c6;margin-left:auto}
+.toggle{width:46px;height:26px;border-radius:999px;background:#cdd5e0;border:0;position:relative;transition:.2s;flex:0 0 auto}
+.toggle i{position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.toggle.on{background:var(--ok)}
+.toggle.on i{left:23px}
+/* visitas */
+.vrow{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.vrow:last-child{border-bottom:0}
+.vyh{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px}
+.vcol{min-width:150px;flex:1}
+.vday{font-size:12px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;padding-bottom:8px;border-bottom:2px solid var(--line);margin-bottom:10px}
+.vitem{background:#fafbfd;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;padding:9px 10px;font-size:12px;margin-bottom:8px}
+.vitem b{display:block;font-size:12.5px;margin-bottom:2px}
+.vtime{font-size:11px;color:var(--gray)}
+/* charts */
+.chart{display:flex;align-items:flex-end;gap:12px;height:180px;padding-top:10px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.chart .bar{width:100%;max-width:46px;background:linear-gradient(180deg,var(--blue),#1f4d80);border-radius:6px 6px 0 0;transition:.3s}
+.chart .cl{font-size:11px;color:var(--gray)}
+.hbar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px}
+.hbar-row .lb{width:112px;flex:0 0 auto;color:var(--ink)}
+.hbar-row .tr{flex:1;background:#eef1f6;border-radius:6px;height:20px;overflow:hidden}
+.hbar-row .tr i{display:block;height:100%;background:var(--amber);border-radius:6px}
+.hbar-row .vl{width:44px;text-align:right;font-weight:600;color:var(--gray)}
+/* prop cards */
+.pcard{display:flex;flex-direction:column;min-width:0}
+.pcard .ph{height:96px;border-radius:12px 12px 0 0;background:linear-gradient(135deg,#1b2f4f,#2f6fb0);display:flex;align-items:center;justify-content:center}
+.pcard .ph svg{width:34px;height:34px;color:rgba(255,255,255,.7)}
+.pcard .pb{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pcard .pr{font-size:17px;font-weight:700;color:var(--navy)}
+.pcard .meta{font-size:12.5px;color:var(--gray);display:flex;gap:10px;flex-wrap:wrap}
+/* public page */
+.pub{background:#fff}
+.pub .hero{background:linear-gradient(135deg,var(--navy),#24406b);color:#fff;padding:34px 22px}
+.pub .hero h1{font-size:26px}
+.pub .hero p{color:#c7d3e8;margin:8px 0 0;font-size:14px}
+.pub-wrap{padding:22px;max-width:1180px;margin:0 auto}
+.modal{position:fixed;inset:0;background:rgba(16,24,40,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:60}
+.modal.on{display:flex}
+.modal .box{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow:auto;padding:22px}
+label.f{display:block;font-size:12.5px;font-weight:600;color:var(--gray);margin:12px 0 5px}
+input.f,select.f,textarea.f{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;font-family:inherit}
+.note{background:#fafbfd;border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12.5px;color:var(--gray)}
+/* welcome */
+.welcome{position:fixed;inset:0;background:linear-gradient(140deg,#0d1a2e,#12213a 55%,#1b2f4f);color:#fff;display:flex;align-items:center;justify-content:center;padding:22px;z-index:80}
+.welcome .in{max-width:480px;text-align:center}
+.welcome .mark{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--amber),#c97f10);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.welcome .mark svg{width:32px;height:32px}
+.welcome h1{font-size:25px;color:#fff}
+.welcome p{color:#b9c6dc;margin:10px 0 22px;font-size:14px}
+.welcome .btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.welcome .tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--amber);margin-bottom:10px}
+.welcome .legal{margin-top:26px;font-size:11.5px;color:#7d8fae}
+/* tour */
+.tour-dim{position:fixed;inset:0;background:transparent;z-index:90;pointer-events:none}
+.tour-spot{position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(9,16,28,.72),0 0 0 3px var(--amber);z-index:91;pointer-events:none;transition:all .28s ease}
+.tour-card{position:fixed;z-index:92;background:#fff;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.35);max-width:380px;width:calc(100% - 28px);padding:18px}
+.tour-card .step{font-size:11.5px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em}
+.tour-card h3{font-size:16.5px;margin:7px 0 8px;color:var(--navy)}
+.tour-card p{margin:0;font-size:13.5px;color:var(--gray)}
+.tour-card .navrow{display:flex;align-items:center;gap:8px;margin-top:16px}
+.tour-card .navrow .sp{flex:1}
+.tour-card .prog{height:4px;border-radius:3px;background:#eef1f6;margin-top:14px;overflow:hidden;display:none}
+.tour-card .prog.on{display:block}
+.tour-card .prog i{display:block;height:100%;background:var(--amber);width:0}
+.tour-close{position:fixed;top:14px;right:14px;z-index:93;background:#fff;border:0;border-radius:999px;padding:9px 14px;font-size:13px;font-weight:600;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;z-index:120;box-shadow:0 10px 30px rgba(0,0,0,.3);opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1}
+.foot-note{text-align:center;color:var(--gray);font-size:12px;padding:26px 16px;border-top:1px solid var(--line);margin-top:26px}
+/* responsive */
+@media(max-width:960px){
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .funnel{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:720px){
+  .app{grid-template-columns:1fr}
+  .side{position:fixed;left:0;top:0;bottom:0;width:250px;transform:translateX(-100%);transition:.25s;z-index:70;height:100vh}
+  .side.open{transform:none}
+  .menu-btn{display:inline-flex!important}
+  .scrim{position:fixed;inset:0;background:rgba(9,16,28,.5);z-index:65;display:none}
+  .scrim.on{display:block}
+  .content{padding:16px}
+  .g4{grid-template-columns:1fr}
+  .funnel{grid-template-columns:repeat(2,1fr)}
+  .tour-card{max-width:none}
+}
+.menu-btn{display:none;background:none;border:0;padding:6px}
+.menu-btn svg{width:22px;height:22px;color:var(--navy)}
+</style>
+</head>
+<body>
+
+<!-- ===== WELCOME / ENTRADA ===== -->
+<div class="welcome" id="welcome">
+  <div class="in">
+    <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#3a2a05" stroke-width="2"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div>
+    <span class="tag">Demo de sistema de gestión</span>
+    <h1>DM Gestión Inmobiliaria</h1>
+    <p>Ordena y sigue automáticamente los interesados: cada consulta se registra, se le hace seguimiento por WhatsApp y se agenda la visita. Este es un ejemplo navegable con datos ficticios.</p>
+    <div class="btns">
+      <button class="btn amber" onclick="enterApp()">Entrar al sistema</button>
+      <button class="btn" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="enterApp();setTimeout(startTour,350)">Ver el recorrido guiado</button>
+    </div>
+    <div class="legal">Demo de referencia hecho por Nocodeveloper. Los datos son de ejemplo.</div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" onclick="toggleSide()"></div>
+
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="side" id="side">
+    <div class="brand">
+      <div class="logo">
+        <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="#3a2a05" stroke-width="2"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></div>
+        <div><b>DM Gestión</b><small>Inmobiliaria · San Juan</small></div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button data-sec="panel" class="active" onclick="go('panel')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Panel del día</button>
+      <button data-sec="interesados" onclick="go('interesados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.6 2.6-5.6 5.5-5.6S14.5 16.4 14.5 20"/><path d="M17 8h4M17 12h4M17 16h4"/></svg>Interesados</button>
+      <button data-sec="propiedades" onclick="go('propiedades')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Propiedades</button>
+      <button data-sec="seguimiento" onclick="go('seguimiento')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>Seguimiento automático</button>
+      <button data-sec="visitas" onclick="go('visitas')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>Visitas</button>
+      <button data-sec="informes" onclick="go('informes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Informes</button>
+      <div class="sep"></div>
+      <button data-sec="web" onclick="go('web')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/></svg>Web pública</button>
+      <button onclick="startTour()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>Recorrido guiado</button>
+    </nav>
+    <div class="foot">Demo · datos de ejemplo<br>Hecho por Nocodeveloper</div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <header class="top">
+      <button class="menu-btn" onclick="toggleSide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div id="crumb" style="font-size:13px;color:var(--gray)">Inmobiliaria · San Juan</div>
+      <div class="who">
+        <button class="btn sm" onclick="startTour()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg>Ver el recorrido guiado</button>
+        <span class="av">MF</span><span>Mariana Fernández · Asesora</span>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ===== PANEL ===== -->
+      <section class="sec on" id="sec-panel">
+        <div class="page-title">
+          <div><h2>Panel del día</h2><p id="today-label">Resumen de la jornada</p></div>
+          <button class="btn primary" onclick="go('interesados')">Ver interesados</button>
+        </div>
+
+        <div class="grid g4" style="margin-bottom:14px">
+          <div class="card kpi" id="tour-nuevos"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div><div class="n" id="k-nuevos">0</div><div class="l">Interesados nuevos sin asignar</div><div class="t">Entran solos desde la web y WhatsApp</div></div>
+          <div class="card kpi"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg></div><div class="n" id="k-visitas">0</div><div class="l">Visitas agendadas hoy</div><div class="t" id="k-visitas-t">con recordatorio enviado</div></div>
+          <div class="card kpi"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div><div class="n" id="k-seg">0</div><div class="l">Seguimientos que toca hoy</div><div class="t">Día 1 · Día 3 · Día 7</div></div>
+          <div class="card kpi"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 13l4 4L19 7"/></svg></div><div class="n" id="k-cierres">0</div><div class="l">Cierres del mes</div><div class="t" id="k-cierres-t">operaciones cerradas</div></div>
+        </div>
+
+        <div class="grid g2">
+          <div class="card">
+            <div class="hd"><h3>Avisos del sistema</h3><span class="pill s-visita"><span class="dot"></span>3 automáticos</span></div>
+            <div class="bd" id="avisos" style="display:flex;flex-direction:column;gap:10px"></div>
+          </div>
+          <div class="card">
+            <div class="hd"><h3>Agenda de hoy</h3><button class="btn sm" onclick="go('visitas')">Ver semana</button></div>
+            <div class="bd" id="agenda-hoy"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== INTERESADOS ===== -->
+      <section class="sec" id="sec-interesados">
+        <div class="page-title">
+          <div><h2>Interesados</h2><p>El corazón del sistema: cada persona, qué busca y en qué etapa está.</p></div>
+          <button class="btn" onclick="go('web')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/></svg>Ver la web pública</button>
+        </div>
+
+        <div class="card" style="margin-bottom:14px" id="tour-embudo">
+          <div class="hd"><h3>Embudo por etapa</h3><span style="font-size:12px;color:var(--gray)">Toca una etapa para filtrar</span></div>
+          <div class="bd"><div class="funnel" id="funnel"></div></div>
+        </div>
+
+        <div class="card">
+          <div class="hd"><h3>Listado</h3><span id="int-count" style="font-size:12px;color:var(--gray)"></span></div>
+          <div class="bd">
+            <div class="filters">
+              <div class="input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="Buscar por nombre, zona o teléfono…" oninput="renderInteresados()"></div>
+              <div class="chips" id="chips"></div>
+            </div>
+            <div class="table-wrap">
+              <table id="tbl-int">
+                <thead><tr><th>Interesado</th><th>Qué busca</th><th>Zona</th><th>Presupuesto</th><th>Etapa</th><th>Asesor</th><th>Origen</th><th></th></tr></thead>
+                <tbody id="tb-int"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ficha -->
+        <div id="ficha" style="display:none"></div>
+      </section>
+
+      <!-- ===== PROPIEDADES ===== -->
+      <section class="sec" id="sec-propiedades">
+        <div class="page-title">
+          <div><h2>Propiedades</h2><p>Cartera con buscador; de cada ficha, qué interesados la siguen y qué visitas tiene.</p></div>
+          <button class="btn" onclick="go('web')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/></svg>Ver la web pública</button>
+        </div>
+        <div class="filters">
+          <div class="input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="qp" placeholder="Buscar por título, zona o estado…" oninput="renderPropiedades()"></div>
+          <div class="chips" id="chips-prop"></div>
+        </div>
+        <div class="grid g3" id="prop-grid"></div>
+      </section>
+
+      <!-- ===== SEGUIMIENTO ===== -->
+      <section class="sec" id="sec-seguimiento">
+        <div class="page-title">
+          <div><h2>Seguimiento automático</h2><p>La secuencia que el sistema corre solo, sin que nadie se acuerde de escribir.</p></div>
+          <div class="card" style="padding:10px 14px;display:flex;align-items:center;gap:12px">
+            <button class="toggle on" id="toggle-seg" onclick="toggleSecuencia()"><i></i></button>
+            <span id="seg-estado" style="font-size:13px;font-weight:600;color:var(--ok)">Secuencia activa</span>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="card" id="tour-secuencia">
+            <div class="hd"><h3>Secuencia que corre sola</h3></div>
+            <div class="bd" id="secuencia"></div>
+          </div>
+          <div class="card">
+            <div class="hd"><h3>Cómo lo ve el interesado (WhatsApp)</h3><span class="pill s-contactado"><span class="dot"></span>maqueta</span></div>
+            <div class="bd">
+              <div class="wa">
+                <div class="phone">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="width:16px;height:16px"><path d="M21 11.5a8.5 8.5 0 0 1-12.7 7.3L3 20l1.3-5.1A8.5 8.5 0 1 1 21 11.5z"/></svg>
+                  DM Gestión Inmobiliaria · +54 9 264 513 0508
+                </div>
+                <div class="thread" id="wa-thread"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VISITAS ===== -->
+      <section class="sec" id="sec-visitas">
+        <div class="page-title"><div><h2>Visitas</h2><p>Agenda de la semana por asesor, con su estado y su recordatorio.</p></div></div>
+        <div class="card" id="tour-visita" style="margin-bottom:14px">
+          <div class="hd"><h3>Próxima visita de hoy</h3><span id="prox-estado" class="pill s-visita"><span class="dot"></span>Confirmada</span></div>
+          <div class="bd" id="prox-visita"></div>
+        </div>
+        <div class="card">
+          <div class="hd"><h3>Semana por asesor</h3></div>
+          <div class="bd"><div class="vyh" id="semana"></div></div>
+        </div>
+      </section>
+
+      <!-- ===== INFORMES ===== -->
+      <section class="sec" id="sec-informes">
+        <div class="page-title"><div><h2>Informes</h2><p>Los números para decidir: de dónde vienen, dónde se traban y cuántos cierran.</p></div></div>
+        <div class="grid g3" style="margin-bottom:14px">
+          <div class="card kpi"><div class="n" id="i-consultas">0</div><div class="l">Consultas en el mes</div></div>
+          <div class="card kpi"><div class="n" id="i-resp">0%</div><div class="l">Tasa de respuesta</div></div>
+          <div class="card kpi"><div class="n" id="i-cierres">0</div><div class="l">Cierres del mes</div></div>
+        </div>
+        <div class="grid g2" id="tour-informes">
+          <div class="card"><div class="hd"><h3>Consultas por mes</h3></div><div class="bd"><div class="chart" id="c-meses"></div></div></div>
+          <div class="card"><div class="hd"><h3>Cierres por mes</h3></div><div class="bd"><div class="chart" id="c-cierres"></div></div></div>
+          <div class="card"><div class="hd"><h3>Interesados por zona</h3></div><div class="bd" id="c-zonas"></div></div>
+          <div class="card"><div class="hd"><h3>Tasa de respuesta por etapa</h3></div><div class="bd" id="c-etapas"></div></div>
+        </div>
+      </section>
+
+      <!-- ===== WEB PÚBLICA ===== -->
+      <section class="sec" id="sec-web">
+        <div class="pub">
+          <div class="hero">
+            <span class="tag" style="color:var(--amber)">Página pública de la inmobiliaria</span>
+            <h1>DM Gestión Inmobiliaria</h1>
+            <p>Propiedades en San Juan · Comprá, vendé o alquilá con asesoramiento real. Escribanos al +54 9 264 513 0508.</p>
+          </div>
+          <div class="pub-wrap">
+            <div class="filters">
+              <div class="input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="qw" placeholder="Buscar por zona, tipo o título…" oninput="renderWeb()"></div>
+              <span style="font-size:12.5px;color:var(--gray)">Toca una propiedad para consultar</span>
+            </div>
+            <div class="grid g3" id="web-grid"></div>
+            <div id="tour-form" class="note" style="margin-top:16px">
+              Cada consulta de este formulario entra al sistema como un <b>interesado nuevo</b>, con la propiedad que miró y el mensaje de WhatsApp listo para el <b>+54 9 264 513 0508</b>.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="foot-note">Demo de referencia hecho por Nocodeveloper. Los datos son de ejemplo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL CONSULTA ===== -->
+<div class="modal" id="modal">
+  <div class="box">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+      <div><h3 id="m-title" style="font-size:18px">Consultar por esta propiedad</h3><p id="m-sub" style="color:var(--gray);font-size:13px;margin:4px 0 0"></p></div>
+      <button class="btn sm" onclick="closeModal()">Cerrar</button>
+    </div>
+    <div id="m-form">
+      <label class="f">Su nombre</label><input class="f" id="f-nombre" placeholder="Nombre y apellido">
+      <label class="f">Teléfono (WhatsApp)</label><input class="f" id="f-tel" placeholder="Ej.: 264 4XX XXXX">
+      <label class="f">¿Qué le interesa?</label>
+      <select class="f" id="f-op"><option>Comprar</option><option>Alquilar</option><option>Solo consultar valor</option></select>
+      <label class="f">Mensaje (opcional)</label><textarea class="f" id="f-msg" rows="2" placeholder="Cuéntenos qué busca"></textarea>
+      <button class="btn amber" style="margin-top:16px;width:100%" onclick="enviarConsulta()">Enviar consulta</button>
+    </div>
+    <div id="m-result" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ===== TOUR ===== -->
+<div class="tour-dim" id="tour-dim"></div>
+<div class="tour-spot" id="tour-spot" style="display:none"></div>
+<div class="tour-card" id="tour-card" style="display:none"></div>
+<button class="tour-close" id="tour-close" style="display:none" onclick="endTour()">Salir</button>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DATOS DE EJEMPLO ================= */
+const ZONAS = ['Villa Krause','Rivadavia','Santa Lucía','Chimbas','Rawson','Capital (Centro)','Pocito','Albardón','Desamparados','Trinidad'];
+const ASESORES = ['Mariana Fernández','Diego Agüero','Lucía Molina','Roberto Sarmiento'];
+const ETAPAS = [
+  {k:'nuevo',t:'Nuevo'},{k:'contactado',t:'Contactado'},{k:'visita',t:'Visita agendada'},
+  {k:'negociacion',t:'En negociación'},{k:'cerrado',t:'Cerrado'},{k:'frio',t:'Frío'}
+];
+const ETAPA_LABEL = Object.fromEntries(ETAPAS.map(e=>[e.k,e.t]));
+
+const PROPIEDADES = [
+  {id:'p1',titulo:'Departamento 2 dorm. con cochera',tipo:'Departamento',zona:'Villa Krause',precio:'$58.000.000',dorm:2,amb:3,sup:64,estado:'disponible'},
+  {id:'p2',titulo:'Casa 3 dorm. con fondo y pileta',tipo:'Casa',zona:'Rivadavia',precio:'$112.000.000',dorm:3,amb:4,sup:180,estado:'disponible'},
+  {id:'p3',titulo:'Dúplex 2 dorm. a estrenar',tipo:'Dúplex',zona:'Santa Lucía',precio:'$74.500.000',dorm:2,amb:3,sup:95,estado:'reservada'},
+  {id:'p4',titulo:'Departamento 1 dorm. amoblado (alquiler)',tipo:'Departamento',zona:'Capital (Centro)',precio:'$340.000/mes',dorm:1,amb:2,sup:42,estado:'disponible'},
+  {id:'p5',titulo:'Local comercial a la calle',tipo:'Local',zona:'Capital (Centro)',precio:'$95.000.000',dorm:0,amb:2,sup:88,estado:'disponible'},
+  {id:'p6',titulo:'Casa 4 dorm. en barrio cerrado',tipo:'Casa',zona:'Chimbas',precio:'$138.000.000',dorm:4,amb:5,sup:240,estado:'disponible'},
+  {id:'p7',titulo:'Terreno 500 m² para construir',tipo:'Terreno',zona:'Pocito',precio:'$29.000.000',dorm:0,amb:0,sup:500,estado:'disponible'},
+  {id:'p8',titulo:'Departamento 3 dorm. con balcón',tipo:'Departamento',zona:'Rivadavia',precio:'$82.000.000',dorm:3,amb:4,sup:105,estado:'vendida'},
+  {id:'p9',titulo:'Monoambiente céntrico (alquiler)',tipo:'Departamento',zona:'Capital (Centro)',precio:'$255.000/mes',dorm:1,amb:1,sup:32,estado:'disponible'},
+  {id:'p10',titulo:'Casa 2 dorm. con garage',tipo:'Casa',zona:'Rawson',precio:'$69.000.000',dorm:2,amb:3,sup:110,estado:'disponible'}
+];
+
+const INTERESADOS = [
+  {id:'i1',nombre:'Ana Gutiérrez',tel:'+54 9 264 512-3456',email:'ana.gutierrez@example.com',op:'Compra',tipo:'Departamento',zona:'Villa Krause',presupuesto:'Hasta $60.000.000',etapa:'visita',asesor:'Mariana Fernández',origen:'Web pública',fecha:'hace 4 días',busca:'Busca 2 dormitorios con cochera, cerca del centro de Villa Krause, para mudarse en marzo.',mostradas:['p1','p3'],stat:'confirmada',
+    historial:[{c:'in',t:'Hola, vi el departamento de Villa Krause en la web. ¿Sigue disponible?',f:'Hace 4 días'},{c:'out',t:'¡Hola Ana! Sí, sigue disponible. Es 2 dormitorios con cochera a $58.000.000. ¿Le paso más fotos?',f:'Hace 4 días'},{c:'in',t:'Sí, por favor. Me interesa verlo el sábado.',f:'Hace 3 días'},{c:'out',t:'Perfecto, agendé su visita para el sábado a las 11:00. Le mando el recordatorio un día antes.',f:'Hace 3 días'}],
+    seg:[{d:'Día 1',a:'Mensaje de bienvenida con las opciones que busca',s:'respondido'},{d:'Día 3',a:'Envío de fichas de propiedades compatibles',s:'respondido'},{d:'Día 7',a:'Recordatorio de visita y confirmación',s:'programado'}]},
+  {id:'i2',nombre:'Carlos Ibáñez',tel:'+54 9 264 518-7742',email:'',op:'Alquiler',tipo:'Departamento',zona:'Capital (Centro)',presupuesto:'Hasta $360.000/mes',etapa:'negociacion',asesor:'Diego Agüero',origen:'WhatsApp',fecha:'hace 9 días',busca:'Alquiler de 1 dormitorio amoblado en el centro, contrato de 12 meses, ingreso en abril.',mostradas:['p4','p9'],stat:'',
+    historial:[{c:'in',t:'¿Cuánto sale el alquiler de un dormitorio en el centro?',f:'Hace 9 días'},{c:'out',t:'Le paso dos opciones amobladas desde $255.000 y $340.000 por mes. ¿Cuándo necesita mudarse?',f:'Hace 9 días'},{c:'in',t:'En abril. La de $340.000 me interesa, ¿se puede negociar el plazo?',f:'Hace 6 días'}],
+    seg:[{d:'Día 1',a:'Respuesta automática con opciones y precios',s:'respondido'},{d:'Día 3',a:'Envío de fichas y condiciones',s:'respondido'},{d:'Día 7',a:'Re-enganche: ¿pudo revisar las opciones?',s:'respondido'}]},
+  {id:'i3',nombre:'Familia Rojas',tel:'+54 9 264 507-1198',email:'',op:'Compra',tipo:'Casa',zona:'Rivadavia',presupuesto:'Hasta $120.000.000',etapa:'cerrado',asesor:'Lucía Molina',origen:'Referido',fecha:'hace 21 días',busca:'Casa de 3 dormitorios con fondo y pileta en Rivadavia, para familia de 5.',mostradas:['p2'],stat:'',
+    historial:[{c:'in',t:'Nos derivó una amiga. Buscamos casa con pileta en Rivadavia.',f:'Hace 21 días'},{c:'out',t:'¡Bienvenidos! Tengo una casa 3 dorm. con fondo y pileta a $112.000.000. Le agendo visita.',f:'Hace 20 días'},{c:'in',t:'Visitamos y nos encantó. Avancemos con la seña.',f:'Hace 8 días'}],
+    seg:[{d:'Día 1',a:'Bienvenida y agendar visita',s:'respondido'},{d:'Día 3',a:'Envío de ficha completa',s:'respondido'},{d:'Día 7',a:'Consultar decisión post-visita',s:'respondido'}]},
+  {id:'i4',nombre:'Martín Silva',tel:'+54 9 264 519-2280',email:'',op:'Compra',tipo:'Terreno',zona:'Pocito',presupuesto:'Hasta $35.000.000',etapa:'nuevo',asesor:'Sin asignar',origen:'Web pública',fecha:'hoy',busca:'Terreno de 500 m² para construir en Pocito, a menos de 10 minutos del centro.',mostradas:[],stat:'',
+    historial:[{c:'in',t:'Consulté por el terreno de 500 m² en Pocito. ¿Cuál es la financiación?',f:'Hoy 09:12'}],
+    seg:[{d:'Día 1',a:'Mensaje de bienvenida por WhatsApp',s:'programado'},{d:'Día 3',a:'Envío de opciones y financiación',s:'programado'},{d:'Día 7',a:'Re-enganche si no responde',s:'programado'}]},
+  {id:'i5',nombre:'Silvia Pereyra',tel:'+54 9 264 505-6631',email:'',op:'Compra',tipo:'Departamento',zona:'Rivadavia',presupuesto:'Hasta $85.000.000',etapa:'contactado',asesor:'Mariana Fernández',origen:'WhatsApp',fecha:'hace 2 días',busca:'Departamento de 3 dormitorios con balcón en Rivadavia, primer piso o superior.',mostradas:['p8'],stat:'',
+    historial:[{c:'in',t:'Me pasaron el dato de un 3 dormitorios en Rivadavia. ¿Lo tienen?',f:'Hace 2 días'},{c:'out',t:'Hola Silvia, ese 3 dorm. ya se vendió, pero tengo opciones parecidas. ¿Le comparto?',f:'Hace 2 días'}],
+    seg:[{d:'Día 1',a:'Respuesta con opciones alternativas',s:'respondido'},{d:'Día 3',a:'Re-enganche con fichas nuevas',s:'programado'},{d:'Día 7',a:'Re-enganche final',s:'programado'}]},
+  {id:'i6',nombre:'Jorge Domínguez',tel:'+54 9 264 511-9020',email:'',op:'Compra',tipo:'Local',zona:'Capital (Centro)',presupuesto:'A consultar',etapa:'contactado',asesor:'Diego Agüero',origen:'Cartel',fecha:'hace 5 días',busca:'Local comercial a la calle para un rubro gastronómico, zona céntrica.',mostradas:['p5'],stat:'',
+    historial:[{c:'in',t:'Vi el cartel del local en el centro. ¿Qué superficie tiene?',f:'Hace 5 días'},{c:'out',t:'Tiene 88 m² y 2 ambientes, a $95.000.000. ¿Coordinamos una visita?',f:'Hace 4 días'}],
+    seg:[{d:'Día 1',a:'Respuesta con datos del local',s:'respondido'},{d:'Día 3',a:'Envío de plano y fotos',s:'programado'},{d:'Día 7',a:'Re-enganche para agendar',s:'programado'}]},
+  {id:'i7',nombre:'Noelia Castro',tel:'+54 9 264 516-4417',email:'',op:'Compra',tipo:'Casa',zona:'Chimbas',presupuesto:'Hasta $145.000.000',etapa:'visita',asesor:'Lucía Molina',origen:'Web pública',fecha:'hace 3 días',busca:'Casa de 4 dormitorios en barrio cerrado de Chimbas, con cochera doble.',mostradas:['p6'],stat:'confirmada',
+    historial:[{c:'in',t:'Me interesa la casa de barrio cerrado en Chimbas. ¿Se puede visitar?',f:'Hace 3 días'},{c:'out',t:'Sí, agendé su visita para mañana a las 17:00. Le envío el recordatorio hoy.',f:'Hace 1 día'}],
+    seg:[{d:'Día 1',a:'Respuesta y agenda de visita',s:'respondido'},{d:'Día 3',a:'Recordatorio de visita 24 h antes',s:'enviado'},{d:'Día 7',a:'Re-enganche post-visita',s:'programado'}]},
+  {id:'i8',nombre:'Pedro Aguirre',tel:'+54 9 264 503-7754',email:'',op:'Alquiler',tipo:'Departamento',zona:'Capital (Centro)',presupuesto:'Hasta $280.000/mes',etapa:'frio',asesor:'Mariana Fernández',origen:'WhatsApp',fecha:'hace 30 días',busca:'Monoambiente céntrico para estudiante, con servicios incluidos.',mostradas:['p9'],stat:'',
+    historial:[{c:'in',t:'¿Tienen monoambiente para estudiante en el centro?',f:'Hace 30 días'},{c:'out',t:'Sí, tengo uno a $255.000 por mes. ¿Le interesa visitarlo?',f:'Hace 30 días'}],
+    seg:[{d:'Día 1',a:'Respuesta con opciones',s:'respondido'},{d:'Día 3',a:'Envío de ficha',s:'enviado'},{d:'Día 7',a:'Re-enganche final (sin respuesta)',s:'sin respuesta'}]},
+  {id:'i9',nombre:'Laura Becerra',tel:'+54 9 264 514-8890',email:'',op:'Compra',tipo:'Dúplex',zona:'Santa Lucía',presupuesto:'Hasta $78.000.000',etapa:'negociacion',asesor:'Roberto Sarmiento',origen:'Web pública',fecha:'hace 11 días',busca:'Dúplex a estrenar de 2 dormitorios en Santa Lucía, apto crédito.',mostradas:['p3','p1'],stat:'',
+    historial:[{c:'in',t:'¿El dúplex de Santa Lucía es apto crédito hipotecario?',f:'Hace 11 días'},{c:'out',t:'Sí, es apto crédito. Está a estrenar, $74.500.000. ¿Avanzamos con la reserva?',f:'Hace 10 días'},{c:'in',t:'Estoy viendo el crédito, en unos días le confirmo la seña.',f:'Hace 4 días'}],
+    seg:[{d:'Día 1',a:'Respuesta y condiciones',s:'respondido'},{d:'Día 3',a:'Envío de documentación para el crédito',s:'respondido'},{d:'Día 7',a:'Seguimiento de la reserva',s:'respondido'}]},
+  {id:'i10',nombre:'Gustavo Herrera',tel:'+54 9 264 508-3311',email:'',op:'Compra',tipo:'Casa',zona:'Rawson',presupuesto:'Hasta $72.000.000',etapa:'nuevo',asesor:'Sin asignar',origen:'Web pública',fecha:'hoy',busca:'Casa de 2 dormitorios con garage en Rawson, para ingresar con su familia.',mostradas:[],stat:'',
+    historial:[{c:'in',t:'Escribí desde la web por la casa de Rawson. ¿Aceptan permuta?',f:'Hoy 10:40'}],
+    seg:[{d:'Día 1',a:'Mensaje de bienvenida por WhatsApp',s:'programado'},{d:'Día 3',a:'Envío de ficha y condiciones de permuta',s:'programado'},{d:'Día 7',a:'Re-enganche si no responde',s:'programado'}]},
+  {id:'i11',nombre:'Romina Vega',tel:'+54 9 264 517-9922',email:'',op:'Alquiler',tipo:'Casa',zona:'Rawson',presupuesto:'Hasta $420.000/mes',etapa:'contactado',asesor:'Diego Agüero',origen:'WhatsApp',fecha:'hace 6 días',busca:'Casa con patio para alquilar en Rawson, se acepta mascota.',mostradas:[],stat:'',
+    historial:[{c:'in',t:'¿Alquilan casas con patio en Rawson? Tengo un perro.',f:'Hace 6 días'},{c:'out',t:'Estamos buscando para usted una que acepte mascota. Le aviso apenas tenga.',f:'Hace 5 días'}],
+    seg:[{d:'Día 1',a:'Respuesta y toma de preferencias',s:'respondido'},{d:'Día 3',a:'Búsqueda activa de opciones',s:'enviado'},{d:'Día 7',a:'Re-enganche con novedades',s:'programado'}]},
+  {id:'i12',nombre:'Héctor Molina',tel:'+54 9 264 502-6640',email:'',op:'Compra',tipo:'Departamento',zona:'Villa Krause',presupuesto:'Hasta $62.000.000',etapa:'cerrado',asesor:'Mariana Fernández',origen:'Web pública',fecha:'hace 26 días',busca:'Departamento de 2 dormitorios con cochera en Villa Krause.',mostradas:['p1'],stat:'',
+    historial:[{c:'in',t:'Consulté por el 2 dormitorios de Villa Krause.',f:'Hace 26 días'},{c:'out',t:'Sí, está disponible. ¿Coordinamos la visita?',f:'Hace 25 días'},{c:'in',t:'Firmamos la reserva, muchas gracias.',f:'Hace 12 días'}],
+    seg:[{d:'Día 1',a:'Bienvenida y visita',s:'respondido'},{d:'Día 3',a:'Envío de ficha',s:'respondido'},{d:'Día 7',a:'Cierre y reserva',s:'respondido'}]},
+  {id:'i13',nombre:'Verónica Luna',tel:'+54 9 264 506-1187',email:'',op:'Compra',tipo:'Departamento',zona:'Rivadavia',presupuesto:'Hasta $80.000.000',etapa:'visita',asesor:'Roberto Sarmiento',origen:'WhatsApp',fecha:'hace 5 días',busca:'Departamento de 2 o 3 dormitorios en Rivadavia, preferentemente con cochera.',mostradas:['p8','p2'],stat:'pendiente',
+    historial:[{c:'in',t:'Busco departamento en Rivadavia, ¿tienen algo?',f:'Hace 5 días'},{c:'out',t:'Tengo una casa y un depto para mostrarle. ¿Le agendo una visita el jueves?',f:'Hace 4 días'}],
+    seg:[{d:'Día 1',a:'Respuesta con opciones',s:'respondido'},{d:'Día 3',a:'Confirmación de visita',s:'respondido'},{d:'Día 7',a:'Recordatorio de visita',s:'programado'}]},
+  {id:'i14',nombre:'Andrés Funes',tel:'+54 9 264 509-4412',email:'',op:'Compra',tipo:'Terreno',zona:'Albardón',presupuesto:'Hasta $30.000.000',etapa:'frio',asesor:'Lucía Molina',origen:'Cartel',fecha:'hace 40 días',busca:'Terreno para viñedo o construcción en Albardón, con agua de riego.',mostradas:[],stat:'',
+    historial:[{c:'in',t:'¿Tienen terrenos con agua de riego en Albardón?',f:'Hace 40 días'},{c:'out',t:'Por el momento no, pero puedo avisarle si aparece uno.',f:'Hace 40 días'}],
+    seg:[{d:'Día 1',a:'Respuesta inicial',s:'respondido'},{d:'Día 3',a:'Envío de alternativas cercanas',s:'enviado'},{d:'Día 7',a:'Re-enganche final (sin respuesta)',s:'sin respuesta'}]},
+  {id:'i15',nombre:'Claudia Navarro',tel:'+54 9 264 515-3320',email:'',op:'Compra',tipo:'Dúplex',zona:'Santa Lucía',presupuesto:'Hasta $76.000.000',etapa:'negociacion',asesor:'Mariana Fernández',origen:'Web pública',fecha:'hace 8 días',busca:'Dúplex de 2 dormitorios en Santa Lucía, a estrenar y apto crédito.',mostradas:['p3'],stat:'',
+    historial:[{c:'in',t:'¿Queda algún dúplex disponible en Santa Lucía?',f:'Hace 8 días'},{c:'out',t:'Hay uno reservado, pero se puede liberar. Le confirmo en el día.',f:'Hace 7 días'},{c:'in',t:'Perfecto, quedo atenta.',f:'Hace 6 días'}],
+    seg:[{d:'Día 1',a:'Respuesta de disponibilidad',s:'respondido'},{d:'Día 3',a:'Confirmación de liberación de reserva',s:'respondido'},{d:'Día 7',a:'Re-enganche para cerrar',s:'programado'}]},
+  {id:'i16',nombre:'Sebastián Paz',tel:'+54 9 264 504-8871',email:'',op:'Alquiler',tipo:'Local',zona:'Capital (Centro)',presupuesto:'Hasta $300.000/mes',etapa:'nuevo',asesor:'Sin asignar',origen:'WhatsApp',fecha:'hoy',busca:'Local pequeño en el centro para alquilar, para un emprendimiento de indumentaria.',mostradas:[],stat:'',
+    historial:[{c:'in',t:'Hola, busco un local chico para alquilar en el centro. ¿Tienen?',f:'Hoy 11:05'}],
+    seg:[{d:'Día 1',a:'Mensaje de bienvenida por WhatsApp',s:'programado'},{d:'Día 3',a:'Envío de opciones de locales',s:'programado'},{d:'Día 7',a:'Re-enganche si no responde',s:'programado'}]}
+];
+
+const VISITAS = [
+  {ia:'i1',prop:'p1',dia:6,hora:'11:00',asesor:'Mariana Fernández',estado:'confirmada'},
+  {ia:'i7',prop:'p6',dia:6,hora:'17:00',asesor:'Lucía Molina',estado:'confirmada'},
+  {ia:'i13',prop:'p2',dia:4,hora:'10:30',asesor:'Roberto Sarmiento',estado:'pendiente'},
+  {ia:'i5',prop:'p8',dia:5,hora:'16:00',asesor:'Mariana Fernández',estado:'pendiente'},
+  {ia:'i6',prop:'p5',dia:2,hora:'09:30',asesor:'Diego Agüero',estado:'realizada'},
+  {ia:'i9',prop:'p3',dia:3,hora:'15:00',asesor:'Roberto Sarmiento',estado:'realizada'},
+  {ia:'i15',prop:'p3',dia:5,hora:'12:00',asesor:'Mariana Fernández',estado:'confirmada'}
+];
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const PROPIEDAD_BY_ID=Object.fromEntries(PROPIEDADES.map(p=>[p.id,p]));
+const INTERESADO_BY_ID=Object.fromEntries(INTERESADOS.map(i=>[i.id,i]));
+const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2600);}
+function pill(etapa){return '<span class="pill s-'+etapa+'"><span class="dot"></span>'+ETAPA_LABEL[etapa]+'</span>';}
+function initials(n){return n.split(' ').filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+/* ================= NAVEGACIÓN ================= */
+let currentSec='panel';
+function go(sec){
+  if(sec!=='interesados'){ /* vuelve al listado si se sale de la ficha */ }
+  currentSec=sec;
+  $$('.sec').forEach(s=>s.classList.toggle('on',s.id==='sec-'+sec));
+  $$('#nav button[data-sec]').forEach(b=>b.classList.toggle('active',b.dataset.sec===sec));
+  $('#crumb').textContent = {panel:'Inmobiliaria · San Juan',interesados:'Interesados',propiedades:'Propiedades',seguimiento:'Seguimiento automático',visitas:'Visitas',informes:'Informes',web:'Web pública'}[sec]||'';
+  window.scrollTo(0,0);
+  closeSide();
+  if(sec==='interesados'){var _f=$('#ficha');if(_f.style.display==='block'){_f.style.display='none';$$('#sec-interesados > .page-title, #sec-interesados > .card').forEach(function(e){e.style.display='';});}}
+  if(tour.active){ if(TOUR_STEPS[tour.i].sec!==sec){ endTour(true); toast('Recorrido cerrado: cambió de sección.'); } }
+}
+function toggleSide(){$('#side').classList.toggle('open');$('#scrim').classList.toggle('on');}
+function closeSide(){$('#side').classList.remove('open');$('#scrim').classList.remove('on');}
+function enterApp(){$('#welcome').style.display='none';}
+
+/* ================= PANEL ================= */
+function renderPanel(){
+  const nuevos=INTERESADOS.filter(i=>i.etapa==='nuevo').length;
+  const hoy=VISITAS.filter(v=>v.dia===6).length; // demo: la jornada es el sábado de ejemplo
+  const seg=INTERESADOS.reduce((a,i)=>a+i.seg.filter(s=>s.s==='programado').length,0);
+  const cierres=INTERESADOS.filter(i=>i.etapa==='cerrado').length;
+  $('#k-nuevos').textContent=nuevos;
+  $('#k-visitas').textContent=hoy;
+  $('#k-seg').textContent=seg;
+  $('#k-cierres').textContent=cierres;
+  const diasSemana=Math.round((cierres+2));
+  $('#k-cierres-t').textContent=cierres+' operaciones cerradas · ejemplo';
+  document.querySelector('#k-visitas-t').textContent='con recordatorio enviado';
+
+  $('#avisos').innerHTML=[
+    {ic:'<path d="M12 5v14M5 12h14"/>',c:'var(--blue)',t:'Nueva consulta registrada sola',d:'Martín Silva escribió desde la web pública por el terreno de Pocito.'},
+    {ic:'<rect x="3" y="4.5" width="18" height="16" rx="2"/><path d="M3 9h18"/>',c:'var(--amber)',t:'Recordatorio de visita enviado',d:'Noelia Castro recibió el aviso por WhatsApp para la visita de mañana 17:00.'},
+    {ic:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>',c:'var(--ok)',t:'Re-enganque a los 7 días',d:'A Pedro Aguirre le toca el mensaje de re-enganque hoy (sin respuesta aún).'}
+  ].map(a=>'<div style="display:flex;gap:11px;align-items:flex-start"><div style="width:30px;height:30px;border-radius:8px;background:#fafbfd;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:0 0 auto"><svg viewBox="0 0 24 24" fill="none" stroke="'+a.c+'" stroke-width="1.9" style="width:16px;height:16px">'+a.ic+'</svg></div><div><div style="font-weight:600;font-size:13.5px">'+a.t+'</div><div style="font-size:12.5px;color:var(--gray)">'+a.d+'</div></div></div>').join('');
+
+  $('#agenda-hoy').innerHTML=VISITAS.filter(v=>v.dia===6).map(v=>{
+    const ia=INTERESADO_BY_ID[v.ia],pr=PROPIEDAD_BY_ID[v.prop];
+    return '<div class="vrow"><div style="width:56px;flex:0 0 auto"><div style="font-weight:700;font-size:14px">'+v.hora+'</div><div class="vtime">'+DIAS[v.dia]+'</div></div><div><b style="font-size:13.5px">'+ia.nombre+'</b><div style="font-size:12.5px;color:var(--gray)">'+pr.titulo+' · '+pr.zona+'</div></div><span class="sp" style="flex:1"></span><span class="pill s-'+(v.estado==='confirmada'?'cerrado':v.estado==='realizada'?'contactado':'visita')+'"><span class="dot"></span>'+v.estado.charAt(0).toUpperCase()+v.estado.slice(1)+'</span></div>';
+  }).join('') || '<div class="note">No hay visitas agendadas para hoy.</div>';
+}
+
+/* ================= INTERESADOS ================= */
+let filtroEtapa='todos';
+function renderChips(){
+  const counts={todos:INTERESADOS.length};
+  ETAPAS.forEach(e=>counts[e.k]=INTERESADOS.filter(i=>i.etapa===e.k).length);
+  $('#chips').innerHTML=[{k:'todos',t:'Todos'}].concat(ETAPAS).map(c=>'<button class="chip'+(filtroEtapa===c.k?' active':'')+'" onclick="setFiltro(\''+c.k+'\')">'+c.t+' ('+counts[c.k]+')</button>').join('');
+}
+function setFiltro(k){filtroEtapa=k;renderChips();renderInteresados();}
+function renderEmbudo(){
+  const counts={};ETAPAS.forEach(e=>counts[e.k]=INTERESADOS.filter(i=>i.etapa===e.k).length);
+  const max=Math.max(1,...Object.values(counts));
+  $('#funnel').innerHTML=ETAPAS.map(e=>'<div class="fn" onclick="setFiltro(\''+e.k+'\')"><div class="c">'+counts[e.k]+'</div><div class="t">'+e.t+'</div><div class="bar"><i style="width:'+(counts[e.k]/max*100)+'%"></i></div></div>').join('');
+}
+function renderInteresados(){
+  renderChips();renderEmbudo();
+  const q=($('#q').value||'').toLowerCase();
+  const rows=INTERESADOS.filter(i=>{
+    if(filtroEtapa!=='todos'&&i.etapa!==filtroEtapa)return false;
+    if(!q)return true;
+    return (i.nombre+i.zona+i.tel+i.tipo+i.op).toLowerCase().includes(q);
+  });
+  $('#int-count').textContent=rows.length+' de '+INTERESADOS.length+' interesados';
+  $('#tb-int').innerHTML=rows.map(i=>'<tr onclick="openFicha(\''+i.id+'\')"><td><div style="display:flex;align-items:center;gap:9px"><span class="av" style="background:#eef1f6;color:var(--navy);font-size:11px">'+initials(i.nombre)+'</span><div><div style="font-weight:600">'+i.nombre+'</div><div class="vtime">'+i.tel+'</div></div></div></td><td>'+i.op+' · '+i.tipo+'</td><td>'+i.zona+'</td><td>'+i.presupuesto+'</td><td>'+pill(i.etapa)+'</td><td>'+i.asesor+'</td><td>'+i.origen+'</td><td style="color:var(--gray)">›</td></tr>').join('') || '<tr><td colspan="8" style="color:var(--gray);padding:22px">No se encontraron interesados con ese criterio.</td></tr>';
+}
+function openFicha(id){
+  const i=INTERESADO_BY_ID[id];
+  $('#sec-interesados').querySelectorAll(':scope > .page-title, :scope > .card').forEach(e=>e.style.display='none');
+  $('#ficha').style.display='block';
+  $('#ficha').innerHTML=`
+  <button class="btn sm" onclick="closeFicha()" style="margin-bottom:14px">‹ Volver al listado</button>
+  <div class="grid g2">
+    <div class="card">
+      <div class="hd"><h3>${i.nombre}</h3>${pill(i.etapa)}</div>
+      <div class="bd">
+        <div class="info-row"><span class="k">Teléfono</span><span class="v">${i.tel}</span></div>
+        <div class="info-row"><span class="k">Correo</span><span class="v">${i.email||'—'}</span></div>
+        <div class="info-row"><span class="k">Origen</span><span class="v">${i.origen}</span></div>
+        <div class="info-row"><span class="k">Asesor</span><span class="v">${i.asesor}</span></div>
+        <div class="info-row"><span class="k">Primer contacto</span><span class="v">${i.fecha}</span></div>
+        <div style="margin-top:14px"><div class="k" style="color:var(--gray);font-size:12.5px;margin-bottom:6px">Qué busca</div>
+        <div class="note" id="tour-ficha">${i.busca}</div></div>
+        <div style="margin-top:14px">
+          <div style="color:var(--gray);font-size:12.5px;margin-bottom:6px">Propiedades mostradas</div>
+          ${i.mostradas.length?i.mostradas.map(p=>'<div style="font-size:13px;padding:6px 0;border-bottom:1px dashed var(--line)">'+PROPIEDAD_BY_ID[p].titulo+' · '+PROPIEDAD_BY_ID[p].precio+'</div>').join(''):'<div style="font-size:13px;color:var(--gray)">Todavía no se le mostraron propiedades.</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><h3>Acciones de seguimiento</h3><span class="pill s-visita"><span class="dot"></span>Día 1 · 3 · 7</span></div>
+      <div class="bd">${i.seg.map((s,n)=>'<div class="seg-step"><div class="seg-num">'+(n+1)+'</div><div><div class="tt">'+s.d+' · '+s.a+'</div><div class="dd">'+segEstado(s.s)+'</div></div></div>').join('')}</div>
+    </div>
+    <div class="card" style="grid-column:1/-1">
+      <div class="hd"><h3>Historial de la conversación</h3><span class="vtime">WhatsApp</span></div>
+      <div class="bd"><div class="chat">${i.historial.map(h=>'<div class="bub '+(h.c==='out'?'out':'in')+'">'+h.t+'<div class="tm">'+h.f+'</div></div>').join('')}</div></div>
+    </div>
+  </div>`;
+  window.scrollTo(0,0);
+  if(tour.active&&TOUR_STEPS[tour.i].target==='#tour-ficha') placeStep();
+}
+function segEstado(s){return {enviado:'<span style="color:var(--ok)">Enviado</span>',programado:'<span style="color:var(--amber)">Programado</span>',respondido:'<span style="color:var(--ok)">Respondido</span>','sin respuesta':'<span style="color:var(--warn)">Sin respuesta</span>'}[s]||s;}
+function closeFicha(){
+  $('#ficha').style.display='none';
+  $('#sec-interesados').querySelectorAll(':scope > .page-title, :scope > .card').forEach(e=>e.style.display='');
+  renderInteresados();
+}
+
+/* ================= PROPIEDADES ================= */
+let filtroProp='todas';
+const ESTADOS_PROP=['disponible','reservada','vendida'];
+function renderPropiedades(){
+  $('#chips-prop').innerHTML=[{k:'todas',t:'Todas'}].concat(ESTADOS_PROP.map(e=>({k:e,t:e.charAt(0).toUpperCase()+e.slice(1)}))).map(c=>'<button class="chip'+(filtroProp===c.k?' active':'')+'" onclick="setFiltroProp(\''+c.k+'\')">'+c.t+'</button>').join('');
+  const q=($('#qp').value||'').toLowerCase();
+  const list=PROPIEDADES.filter(p=>{
+    if(filtroProp!=='todas'&&p.estado!==filtroProp)return false;
+    if(!q)return true;
+    return (p.titulo+p.zona+p.estado+p.tipo).toLowerCase().includes(q);
+  });
+  $('#prop-grid').innerHTML=list.map(p=>{
+    const activos=INTERESADOS.filter(i=>i.mostradas.includes(p.id)&&i.etapa!=='cerrado'&&i.etapa!=='frio').length;
+    const vs=VISITAS.filter(v=>v.prop===p.id).length;
+    return '<div class="card pcard"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="pb"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div style="font-weight:600;font-size:14px">'+p.titulo+'</div>'+propPill(p.estado)+'</div><div class="pr">'+p.precio+'</div><div class="meta"><span>'+p.zona+'</span><span>'+(p.dorm?p.dorm+' dorm.':'—')+'</span><span>'+p.sup+' m²</span></div><div class="meta" style="margin-top:6px;color:var(--navy);font-weight:600">'+activos+' interesados activos · '+vs+' visitas</div><div style="margin-top:auto;padding-top:10px"><button class="btn sm primary" onclick="go(\'web\');setTimeout(()=>openConsulta(\''+p.id+'\'),200)">Consultar</button></div></div></div>';
+  }).join('') || '<div class="note">Sin propiedades con ese criterio.</div>';
+}
+function propPill(e){const m={disponible:'s-cerrado',reservada:'s-visita',vendida:'s-frio'};return '<span class="pill '+m[e]+'"><span class="dot"></span>'+e.charAt(0).toUpperCase()+e.slice(1)+'</span>';}
+function setFiltroProp(k){filtroProp=k;renderPropiedades();}
+
+/* ================= SEGUIMIENTO ================= */
+const SECUENCIA=[
+  {t:'Mensaje al recibir la consulta',w:'inmediato',d:'Apenas entra la consulta (web, WhatsApp o cartel), el sistema le responde por WhatsApp con las opciones que busca y registra al interesado.'},
+  {t:'Recordatorio de visita',w:'24 h antes',d:'Un día antes de la visita agendada, se envía el recordatorio con dirección y horario, y se pide confirmación.'},
+  {t:'Re-enganche a los 3 días',w:'día 3',d:'Si el interesado no respondió, a los 3 días se le envían fichas de propiedades compatibles.'},
+  {t:'Re-enganche a los 7 días',w:'día 7',d:'Último empujón: si sigue sin responder, se le pasa a la etapa Frío y se archiva con su historial.'},
+  {t:'Aviso cuando abre o contesta',w:'en el momento',d:'Cuando el interesado abre el mensaje o contesta, el asesor recibe el aviso al instante para tomar la conversación.'}
+];
+const WA_MSGS=[
+  {c:'in',t:'Hola, vi el departamento de Villa Krause en la web. ¿Sigue disponible?',tm:'09:12'},
+  {c:'out',t:'¡Hola! Sí, sigue disponible. Es 2 dormitorios con cochera a $58.000.000. Le envío las fotos y coordinamos una visita cuando quiera.',tm:'09:12'},
+  {c:'out',t:'Recordatorio: su visita es mañana a las 11:00. Dirección: Villa Krause. Responda CONFIRMO para dejarla agendada.',tm:'Día antes · 18:00'},
+  {c:'in',t:'CONFIRMO. Gracias.',tm:'18:04'}
+];
+let secActiva=true;
+function renderSeguimiento(){
+  $('#secuencia').innerHTML=SECUENCIA.map((s,n)=>'<div class="seg-step"><div class="seg-num">'+(n+1)+'</div><div><div class="tt">'+s.t+' <span class="pill s-contactado" style="margin-left:4px"><span class="dot"></span>'+s.w+'</span></div><div class="dd">'+s.d+'</div></div></div>').join('');
+  renderWA();
+}
+function renderWA(){
+  const th=$('#wa-thread');
+  if(!secActiva){th.innerHTML='<div style="color:#5b6577;font-size:13px;text-align:center;padding:30px">Secuencia en pausa. No se envían mensajes automáticos.</div>';return;}
+  th.innerHTML=WA_MSGS.map(m=>'<div class="msg '+(m.c==='out'?'out':'')+'">'+m.t+'<div class="tm">'+m.tm+' ✓✓</div></div>').join('');
+}
+function toggleSecuencia(){
+  secActiva=!secActiva;
+  $('#toggle-seg').classList.toggle('on',secActiva);
+  const e=$('#seg-estado');e.textContent=secActiva?'Secuencia activa':'Secuencia en pausa';
+  e.style.color=secActiva?'var(--ok)':'var(--warn)';
+  renderWA();
+}
+
+/* ================= VISITAS ================= */
+function renderVisitas(){
+  const v=VISITAS.find(x=>x.dia===6);
+  if(v){
+    const ia=INTERESADO_BY_ID[v.ia],pr=PROPIEDAD_BY_ID[v.prop];
+    $('#prox-visita').innerHTML='<div class="grid g3"><div><div class="k" style="color:var(--gray);font-size:12.5px">Interesado</div><div style="font-weight:600">'+ia.nombre+'</div><div class="vtime">'+ia.tel+'</div></div><div><div class="k" style="color:var(--gray);font-size:12.5px">Propiedad</div><div style="font-weight:600">'+pr.titulo+'</div><div class="vtime">'+pr.zona+' · '+pr.precio+'</div></div><div><div class="k" style="color:var(--gray);font-size:12.5px">Cuándo</div><div style="font-weight:600">'+DIAS[v.dia]+' '+v.hora+' hs</div><div class="vtime">Asesora: '+v.asesor+'</div></div></div><div class="note" style="margin-top:14px">Recordatorio automático enviado 24 h antes por WhatsApp. El interesado confirmó.</div>';
+  }
+  $('#semana').innerHTML=ASESORES.map(a=>{
+    const items=VISITAS.filter(v=>v.asesor===a);
+    return '<div class="vcol"><div class="vday">'+a+'</div>'+(items.length?items.map(v=>{
+      const ia=INTERESADO_BY_ID[v.ia],pr=PROPIEDAD_BY_ID[v.prop];
+      return '<div class="vitem" style="border-left-color:'+(v.estado==='realizada'?'var(--ok)':v.estado==='confirmada'?'var(--blue)':'var(--amber)')+'"><b>'+ia.nombre+'</b><div class="vtime">'+DIAS[v.dia]+' '+v.hora+' · '+pr.zona+'</div><div style="margin-top:5px">'+propPillV(v.estado)+'</div></div>';
+    }).join(''):'<div class="vtime">Sin visitas esta semana</div>')+'</div>';
+  }).join('');
+}
+function propPillV(e){const m={confirmada:'s-cerrado',pendiente:'s-visita',realizada:'s-contactado'};const t={confirmada:'Confirmada',pendiente:'Pendiente',realizada:'Realizada'};return '<span class="pill '+m[e]+'"><span class="dot"></span>'+t[e]+'</span>';}
+
+/* ================= INFORMES ================= */
+function renderInformes(){
+  const meses=[{m:'Jun',v:38},{m:'Jul',v:44},{m:'Ago',v:41},{m:'Sep',v:52},{m:'Oct',v:49},{m:'Nov',v:57}];
+  const cierres=[{m:'Jun',v:3},{m:'Jul',v:4},{m:'Ago',v:3},{m:'Sep',v:5},{m:'Oct',v:4},{m:'Nov',v:6}];
+  const totalConsultas=meses.reduce((a,x)=>a+x.v,0);
+  const totalCierres=cierres.reduce((a,x)=>a+x.v,0);
+  const resp=Math.round(INTERESADOS.filter(i=>i.historial.some(h=>h.c==='in')).length/INTERESADOS.length*100);
+  $('#i-consultas').textContent=meses[meses.length-1].v;
+  $('#i-resp').textContent='82%';
+  $('#i-cierres').textContent=cierres[cierres.length-1].v;
+  $('#c-meses').innerHTML=chartBars(meses,'#2f6fb0');
+  $('#c-cierres').innerHTML=chartBars(cierres,'#e09b1e');
+  const zonas={};INTERESADOS.forEach(i=>zonas[i.zona]=(zonas[i.zona]||0)+1);
+  const zmax=Math.max(...Object.values(zonas));
+  $('#c-zonas').innerHTML=Object.entries(zonas).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([z,n])=>'<div class="hbar-row"><span class="lb">'+z+'</span><span class="tr"><i style="width:'+(n/zmax*100)+'%"></i></span><span class="vl">'+n+'</span></div>').join('');
+  const etapas=[{t:'Contactado',v:92},{t:'Visita agendada',v:71},{t:'En negociación',v:58},{t:'Cerrado',v:34}];
+  $('#c-etapas').innerHTML=etapas.map(e=>'<div class="hbar-row"><span class="lb">'+e.t+'</span><span class="tr"><i style="width:'+e.v+'%;background:linear-gradient(90deg,var(--ok),#2f6fb0)"></i></span><span class="vl">'+e.v+'%</span></div>').join('');
+}
+function chartBars(data,color){
+  const max=Math.max(...data.map(d=>d.v));
+  return data.map(d=>'<div class="col"><span style="font-size:11.5px;font-weight:600;color:var(--gray)">'+d.v+'</span><div class="bar" style="height:'+(d.v/max*130)+'px;background:linear-gradient(180deg,'+color+',#1f4d80)"></div><span class="cl">'+d.m+'</span></div>').join('');
+}
+
+/* ================= WEB PÚBLICA ================= */
+function renderWeb(){
+  const q=($('#qw').value||'').toLowerCase();
+  const list=PROPIEDADES.filter(p=>p.estado!=='vendida').filter(p=>!q||(p.titulo+p.zona+p.tipo).toLowerCase().includes(q));
+  $('#web-grid').innerHTML=list.map(p=>'<div class="card pcard"><div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></div><div class="pb"><div style="font-weight:600;font-size:14px">'+p.titulo+'</div><div class="pr">'+p.precio+'</div><div class="meta"><span>'+p.zona+'</span><span>'+(p.dorm?p.dorm+' dorm.':'—')+'</span><span>'+p.sup+' m²</span></div><div style="margin-top:auto;padding-top:10px"><button class="btn amber sm" onclick="openConsulta(\''+p.id+'\')">Consultar por esta propiedad</button></div></div></div>').join('')||'<div class="note">Sin resultados.</div>';
+}
+let consultaProp=null;
+function openConsulta(id){consultaProp=id;const p=PROPIEDAD_BY_ID[id];$('#m-title').textContent='Consultar por esta propiedad';$('#m-sub').textContent=p.titulo+' · '+p.zona+' · '+p.precio;$('#m-form').style.display='block';$('#m-result').style.display='none';$('#modal').classList.add('on');}
+function closeModal(){$('#modal').classList.remove('on');}
+function enviarConsulta(){
+  const nombre=$('#f-nombre').value.trim()||'Visitante';
+  const tel=$('#f-tel').value.trim()||'(sin teléfono)';
+  const op=$('#f-op').value;
+  const msg=$('#f-msg').value.trim();
+  const p=PROPIEDAD_BY_ID[consultaProp];
+  const texto='Hola, me interesa la propiedad "'+p.titulo+'" ('+p.zona+', '+p.precio+'). Quiero '+op.toLowerCase()+(msg?'. '+msg:'')+'. Mi nombre: '+nombre+'. Mi teléfono: '+tel+'.';
+  const wa='https://wa.me/5492645130508?text='+encodeURIComponent(texto);
+  $('#m-result').innerHTML=`
+    <div class="note" style="border-left:3px solid var(--ok)">
+      <div style="font-weight:600;color:var(--ok);margin-bottom:6px">✓ Consulta registrada en el sistema</div>
+      El interesado <b>${nombre}</b> entró como <b>nuevo</b> con la propiedad <b>${p.titulo}</b> y la secuencia de seguimiento (día 1 · 3 · 7) quedó programada.
+    </div>
+    <label class="f">Mensaje de WhatsApp que se enviaría al ${'+54 9 264 513 0508'}</label>
+    <div class="note" style="white-space:pre-wrap">${texto}</div>
+    <a class="btn amber" style="margin-top:14px;width:100%;justify-content:center" href="${wa}" target="_blank" rel="noopener">Abrir WhatsApp con el mensaje</a>
+    <button class="btn" style="margin-top:10px;width:100%;justify-content:center" onclick="closeModal()">Cerrar</button>`;
+  $('#m-form').style.display='none';
+  $('#m-result').style.display='block';
+}
+
+/* ================= RECORRIDO GUIADO ================= */
+const TOUR_STEPS=[
+  {sec:'panel',target:'#tour-nuevos',title:'Entra una consulta y se registra sola',
+   text:'Cada consulta que llega por la web, WhatsApp o un cartel queda cargada como interesado sin que nadie la copie a mano. Aquí ve los nuevos sin asignar que todavía hay que repartir entre los asesores.'},
+  {sec:'interesados',target:'#tour-embudo',title:'Se ordena por etapa',
+   text:'Los interesados se agrupan por etapa del embudo: nuevo, contactado, visita agendada, en negociación, cerrado o frío. Así se ve de un vistazo dónde está cada persona y qué toca hacer.'},
+  {sec:'interesados',target:'#tour-ficha',title:'La ficha con lo que busca',before(){openFicha('i1');},
+   text:'En la ficha está todo junto: qué operación y zona busca, con qué presupuesto, las propiedades que ya se le mostraron, el historial completo de la conversación y las acciones de seguimiento programadas.'},
+  {sec:'seguimiento',target:'#tour-secuencia',title:'La secuencia de seguimiento por WhatsApp',
+   text:'Esta es la pieza que corre sola: responde la consulta, recuerda la visita y re-engancha a los 3 y 7 días. La maqueta de al lado muestra cómo le llegarían los mensajes al interesado.'},
+  {sec:'visitas',target:'#tour-visita',title:'La visita agendada con su recordatorio',
+   text:'Cuando el interesado quiere ver la propiedad, se agenda la visita y el sistema envía el recordatorio 24 horas antes con dirección y horario. El asesor ve toda la agenda de la semana.'},
+  {sec:'informes',target:'#tour-informes',title:'Informes para decidir',
+   text:'Con los gráficos se decide: cuántas consultas entran por mes, de qué zonas vienen, en qué etapa se traban y cuántas operaciones se cierran. Números para la reunión, no intuición.'},
+  {sec:'web',target:'#tour-form',title:'La web pública como entrada',
+   text:'La página pública es la puerta de entrada: el cliente busca una propiedad y consulta desde el formulario. Esa consulta cae directo en el sistema con el mensaje de WhatsApp ya armado.'}
+];
+const tour={active:false,i:0,auto:false,autoT:null,autoStart:0,tickT:null};
+function startTour(){
+  if(!$('#welcome') || $('#welcome').style.display==='none'){enterApp();}
+  else{enterApp();}
+  tour.active=true;tour.i=0;
+  $('#tour-close').style.display='block';
+  showStep(0);
+}
+function endTour(silent){
+  tour.active=false;stopAuto();
+  $('#tour-spot').style.display='none';$('#tour-card').style.display='none';$('#tour-close').style.display='none';
+  var _f=$('#ficha');if(_f&&_f.style.display==='block'){_f.style.display='none';$$('#sec-interesados > .page-title, #sec-interesados > .card').forEach(function(e){e.style.display='';});}
+  if(!silent)toast('Recorrido finalizado.');
+}
+function showStep(n){
+  tour.i=Math.max(0,Math.min(TOUR_STEPS.length-1,n));
+  const st=TOUR_STEPS[tour.i];
+  go(st.sec);
+  if(st.before)st.before();
+  // re-afirma que el tour siga activo tras go()
+  tour.active=true;
+  requestAnimationFrame(()=>{setTimeout(()=>placeStep(),60);});
+  renderCard();
+}
+function renderCard(){
+  const st=TOUR_STEPS[tour.i];
+  const n=tour.i+1,tot=TOUR_STEPS.length;
+  $('#tour-card').innerHTML=`
+    <div class="step">Paso ${n} de ${tot}</div>
+    <h3>${st.title}</h3>
+    <p>${st.text}</p>
+    <div class="prog ${tour.auto?'on':''}"><i id="tour-prog"></i></div>
+    <div class="navrow">
+      <button class="btn sm" onclick="prevStep()" ${tour.i===0?'disabled style="opacity:.5"':''}>Atrás</button>
+      <button class="btn sm primary" onclick="nextStep()">${tour.i===tot-1?'Finalizar':'Siguiente'}</button>
+      <span class="sp"></span>
+      <button class="btn sm" onclick="toggleAuto()">${tour.auto?'Pausar':'Automático'}</button>
+      <button class="btn sm" onclick="endTour()">Salir</button>
+    </div>`;
+  $('#tour-card').style.display='block';
+}
+function nextStep(){if(tour.i>=TOUR_STEPS.length-1){endTour();}else{showStep(tour.i+1);}}
+function prevStep(){showStep(tour.i-1);}
+function toggleAuto(){
+  if(tour.auto){stopAuto();}
+  else{
+    tour.auto=true;tour.autoStart=Date.now();
+    $('#tour-card').querySelector('.prog').classList.add('on');
+    tour.autoT=setInterval(()=>{ if(tour.i>=TOUR_STEPS.length-1){stopAuto();return;} showStep(tour.i+1); tour.autoStart=Date.now(); },6000);
+    tour.tickT=setInterval(()=>{const el=$('#tour-prog');if(el){const p=Math.min(100,(Date.now()-tour.autoStart)/6000*100);el.style.width=p+'%';}},100);
+    renderCard();
+  }
+}
+function stopAuto(){tour.auto=false;clearInterval(tour.autoT);clearInterval(tour.tickT);const el=$('#tour-prog');if(el){el.style.width='0';}}
+function placeStep(){
+  if(!tour.active)return;
+  const st=TOUR_STEPS[tour.i];
+  const el=document.querySelector(st.target);
+  if(!el){$('#tour-spot').style.display='none';$('#tour-card').style.left='14px';$('#tour-card').style.top='70px';return;}
+  const r=el.getBoundingClientRect();
+  const pad=8;
+  const sp=$('#tour-spot');
+  sp.style.display='block';
+  sp.style.left=(r.left-pad)+'px';
+  sp.style.top=(r.top-pad)+'px';
+  sp.style.width=(r.width+pad*2)+'px';
+  sp.style.height=(r.height+pad*2)+'px';
+  const card=$('#tour-card');
+  const cw=Math.min(380,window.innerWidth-28);
+  const ch=card.offsetHeight||210;
+  let left=r.left;
+  if(left+cw>window.innerWidth-14)left=window.innerWidth-cw-14;
+  if(left<14)left=14;
+  let top=r.bottom+14;
+  if(top+ch>window.innerHeight-14){top=Math.max(14,r.top-ch-14);}
+  card.style.left=left+'px';
+  card.style.top=top+'px';
+}
+window.addEventListener('resize',()=>{if(tour.active)placeStep();});
+window.addEventListener('scroll',()=>{if(tour.active)placeStep();},true);
+document.addEventListener('keydown',e=>{
+  if(!tour.active)return;
+  if(e.key==='ArrowRight')nextStep();
+  else if(e.key==='ArrowLeft')prevStep();
+  else if(e.key==='Escape')endTour();
+});
+
+/* ================= INIT ================= */
+function init(){
+  renderPanel();renderInteresados();renderPropiedades();renderSeguimiento();renderVisitas();renderInformes();renderWeb();
+}
+init();
+</script>
+</body>
+</html>
